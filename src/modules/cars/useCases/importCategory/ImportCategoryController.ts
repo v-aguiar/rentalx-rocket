@@ -7,8 +7,11 @@ class ImportCategoryController {
 
   handle(request: Request, response: Response): Response {
     const { file } = request;
-    console.log(file);
 
+    /** 
+     * O argumento do tipo 'File | undefined' não é atribuível ao parâmetro do tipo 'File'.
+     * O tipo 'undefined' não pode ser atribuído ao tipo 'File'.ts(2345) 
+    **/
     this.importCategoryUseCase.execute(file);
 
     return response.send();

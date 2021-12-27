@@ -1,5 +1,6 @@
-﻿import { parse } from 'csv-parse';
-import fs from 'fs';
+﻿import fs from 'fs';
+
+import { parse } from 'csv-parse';
 
 import { ICategoriesRepository } from "../../repositories/ICategoriesRepository";
 
@@ -11,7 +12,7 @@ interface IImportCategory {
 class ImportCategoryUseCase {
   constructor(private categoriesRepository: ICategoriesRepository) { }
 
-  loadCategories(file: Express.Multer.File) {
+  loadCategories(file: Express.Multer.File): Promise<IImportCategory[]> {
     return new Promise((resolve, reject) => {
       const categories: IImportCategory[] = [];
 
@@ -22,33 +23,37 @@ class ImportCategoryUseCase {
 
       parseFile
         .on("data", async (line) => {
-          const { name, description } = line;
+          const [name, untrimedDescription] = line;
+
+          const description = untrimedDescription.trim();
 
           categories.push({
             name,
             description
           });
-
-          categories.map((category) => {
-            const categoryAlreadyExists = this.categoriesRepository.categoryByName(category.name);
-
-            if (!categoryAlreadyExists) {
-              this.categoriesRepository.create({ name, description });
-            }
-          });
         })
         .on("end", () => {
-          resolve(categories);
+          return resolve(categories);
+        })
+        .on("error", (err: any) => {
+          reject(err);
         });
-
-
-
-
-    })
+    });
   }
 
-  execute(file: Express.Multer.File): void {
+  async execute(file: Express.Multer.File | any): Promise<void> {
+    const categories = await this.loadCategories(file);
 
+    categories.map(async (category) => {
+      const categoryAlreadyExists = this.categoriesRepository.categoryByName(category.name);
+
+      if (!categoryAlreadyExists) {
+        const name = category.name
+        const description = category.description
+
+        this.categoriesRepository.create({ name, description })
+      }
+    })
   }
 }
 
