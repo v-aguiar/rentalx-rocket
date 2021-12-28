@@ -9,7 +9,7 @@
     }
   },
   "paths": {
-    "categories": {
+    "/categories": {
       "post": {
         "tags": [
           "Category"
@@ -52,7 +52,29 @@
         ],
         "summary": "List Categories",
         "description": "List all categories",
-        "responses": {}
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "aplication/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "name": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

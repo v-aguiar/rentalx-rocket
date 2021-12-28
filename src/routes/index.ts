@@ -1,11 +1,16 @@
-﻿import { Router } from 'express'
+﻿import { Router } from 'express';
 
-import { categoriesRoutes } from './categories.routes'
-import { specificationsRoutes } from './specifications.routes'
+import swaggerUi from 'swagger-ui-express';
+import swaggerFile from '../../swagger.json';
 
-const router = Router()
+import { categoriesRoutes } from './categories.routes';
+import { specificationsRoutes } from './specifications.routes';
 
-router.use('/categories', categoriesRoutes)
-router.use('/specifications', specificationsRoutes)
+const router = Router();
 
-export { router }
+router.use('/categories', categoriesRoutes);
+router.use('/specifications', specificationsRoutes);
+
+router.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerFile));
+
+export { router };
